@@ -1,0 +1,10 @@
+# Discord Bot Dependencies
+discord.py>=2.3.2
+python-dotenv>=1.0.0
+
+# AI API Clients
+openai>=1.12.0
+# anthropic>=0.18.0  # Uncomment if using Claude
+
+# Utilities
+aiohttp>=3.9.0
