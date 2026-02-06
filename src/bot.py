@@ -139,9 +139,9 @@ Améliorer votre pitch, gérer les objections, et convaincre même les clients l
 
     async def setup_hook(self):
         """Configuration initiale du bot"""
-        # Synchroniser les commandes slash avec Discord
-        await self.tree.sync()
-        print("✅ Commandes slash synchronisées")
+        # La synchronisation des commandes se fait dans on_ready()
+        # car self.guilds n'est pas encore disponible ici
+        pass
 
     async def on_ready(self):
         """Événement déclenché quand le bot est prêt"""
@@ -152,10 +152,35 @@ Améliorer votre pitch, gérer les objections, et convaincre même les clients l
         model_info = self.ai_client.get_model_info()
         print(f"🤖 Modèle IA : {model_info['model']} ({model_info['provider']})")
 
+        # Synchroniser les commandes slash avec Discord (par serveur = instantané)
+        print("🔄 Synchronisation des commandes slash...")
+
+        # Vérifier combien de commandes sont enregistrées
+        commands = self.tree.get_commands()
+        print(f"📝 {len(commands)} commandes globales enregistrées : {[cmd.name for cmd in commands]}")
+
+        # Synchroniser par serveur (copie les commandes globales vers chaque serveur)
+        for guild in self.guilds:
+            # Copier les commandes globales vers ce serveur
+            self.tree.copy_global_to(guild=guild)
+            # Synchroniser avec Discord
+            synced = await self.tree.sync(guild=guild)
+            print(f"  ✅ Serveur '{guild.name}' : {len(synced)} commandes synchronisées")
+
+        print("✅ Toutes les commandes sont prêtes !")
+
     async def on_message(self, message: discord.Message):
         """Événement déclenché à chaque message"""
         # Ignorer les messages du bot lui-même
         if message.author == self.user:
+            return
+
+        # Ignorer les messages des autres bots
+        if message.author.bot:
+            return
+
+        # Ignorer les messages système (ajout de bot, pins, etc.)
+        if message.type != discord.MessageType.default and message.type != discord.MessageType.reply:
             return
 
         # Ignorer les messages qui sont des commandes
