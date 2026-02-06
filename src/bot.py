@@ -14,6 +14,34 @@ from .modes.webradio_mode import WebRadioMode
 from .modes.organisation_mode import OrganisationMode
 
 
+# Couleurs des modes selon le plan
+MODE_COLORS = {
+    "branding": 0x3498db,  # Bleu
+    "gamemaster": 0x9b59b6,  # Violet
+    "webradio": 0xe67e22,  # Orange
+    "organisation": 0x2ecc71,  # Vert
+    "default": 0x95a5a6,  # Gris
+    "error": 0xe74c3c,  # Rouge
+    "success": 0x2ecc71,  # Vert
+}
+
+
+def create_embed(title: str, description: str, color_key: str = "default", footer: Optional[str] = None) -> discord.Embed:
+    """Crée un embed Discord formaté"""
+    embed = discord.Embed(
+        title=title,
+        description=description,
+        color=MODE_COLORS.get(color_key, MODE_COLORS["default"])
+    )
+
+    if footer:
+        embed.set_footer(text=footer)
+    else:
+        embed.set_footer(text="Bot d'Entraînement Commercial • Tapez /help pour l'aide")
+
+    return embed
+
+
 class SalesChallengeBot(discord.Client):
     """Bot Discord pour l'entraînement commercial"""
 
@@ -47,9 +75,26 @@ class SalesChallengeBot(discord.Client):
             session.set_mode(branding_mode)
             session.conversation_history = []  # Reset history
 
-            # Envoyer le menu de sélection
-            menu = BrandingMode.get_persona_selection_message()
-            await interaction.response.send_message(menu)
+            # Créer un embed pour le menu de sélection
+            embed = create_embed(
+                title="🎨 Mode Branding - Sélection de Persona",
+                description=(
+                    "Choisissez un client à qui présenter votre offre de branding/web/graphisme :\n\n"
+                    "**1️⃣ Clara - L'Équilibriste Épuisé·e**\n"
+                    "Créatif·ve submergé·e, cherche simplicité et accompagnement.\n"
+                    "*Tapez : `clara`*\n\n"
+                    "**2️⃣ Antoine - Le Stratège Lucide**\n"
+                    "Entrepreneur expérimenté, cherche vision et ROI clair.\n"
+                    "*Tapez : `antoine`*\n\n"
+                    "**3️⃣ Julie - Le Sceptique Dominant**\n"
+                    "Client pressé et exigeant, teste votre autorité.\n"
+                    "*Tapez : `julie`*"
+                ),
+                color_key="branding",
+                footer="Choisissez votre persona en tapant son prénom dans le chat"
+            )
+
+            await interaction.response.send_message(embed=embed)
 
         @self.tree.command(name="gamemaster", description="Mode Game Master JDR")
         async def gamemaster_command(interaction: discord.Interaction):
@@ -61,11 +106,22 @@ class SalesChallengeBot(discord.Client):
             session.set_mode(mode)
             session.conversation_history = []
 
-            await interaction.response.send_message(
-                f"🎭 **Mode activé : {mode.get_mode_name()}**\n\n"
-                "Présentez vos illustrations JDR générées par IA. "
-                "Je vais évaluer leur pertinence pour mes campagnes."
+            embed = create_embed(
+                title="🎲 Mode Game Master JDR",
+                description=(
+                    "**Mode activé avec succès !**\n\n"
+                    "Je suis un maître du jeu passionné mais exigeant. "
+                    "Présentez-moi vos illustrations JDR générées par IA.\n\n"
+                    "Je vais évaluer :\n"
+                    "• La valeur narrative et l'immersion\n"
+                    "• L'authenticité vs illustrations générées par IA\n"
+                    "• Les droits d'usage (réutilisation, impression, projection)\n\n"
+                    "**À vous de me convaincre !**"
+                ),
+                color_key="gamemaster"
             )
+
+            await interaction.response.send_message(embed=embed)
 
         @self.tree.command(name="webradio", description="Mode Partenaire WebRadio")
         async def webradio_command(interaction: discord.Interaction):
@@ -77,10 +133,22 @@ class SalesChallengeBot(discord.Client):
             session.set_mode(mode)
             session.conversation_history = []
 
-            await interaction.response.send_message(
-                f"🎭 **Mode activé : {mode.get_mode_name()}**\n\n"
-                "Présentez-moi votre webradio et expliquez pourquoi je devrais y investir mon budget publicitaire."
+            embed = create_embed(
+                title="📻 Mode Partenaire WebRadio",
+                description=(
+                    "**Mode activé avec succès !**\n\n"
+                    "Je suis un responsable marketing/annonceur potentiel, orienté ROI. "
+                    "Présentez-moi votre webradio et expliquez pourquoi je devrais y investir mon budget publicitaire.\n\n"
+                    "Je veux savoir :\n"
+                    "• Chiffres d'audience précis et vérifiables\n"
+                    "• ROI mesurable comparé à d'autres leviers (réseaux sociaux, Google Ads)\n"
+                    "• Métriques de tracking et reporting\n\n"
+                    "**Je protège mon budget. Convainquez-moi !**"
+                ),
+                color_key="webradio"
             )
+
+            await interaction.response.send_message(embed=embed)
 
         @self.tree.command(name="organisation", description="Mode Client Organisation/Productivité (Plan Bzz)")
         async def organisation_command(interaction: discord.Interaction):
@@ -95,47 +163,86 @@ class SalesChallengeBot(discord.Client):
             # Ce mode a un message d'ouverture prédéfini
             initial_msg = mode.get_initial_message()
 
-            await interaction.response.send_message(
-                f"🎭 **Mode activé : {mode.get_mode_name()}**\n\n{initial_msg}"
+            embed = create_embed(
+                title="📋 Mode Organisation/Productivité",
+                description=(
+                    f"**Mode activé avec succès !**\n\n"
+                    f"{initial_msg}\n\n"
+                    "Je suis ultra-sceptique et rationnel. "
+                    "J'ai déjà essayé et abandonné : agendas, Notion, Bullet Journal.\n\n"
+                    "**Je compare tout à un agenda à 15€. Prouvez-moi que ça vaut le coup !**"
+                ),
+                color_key="organisation"
             )
+
+            await interaction.response.send_message(embed=embed)
 
         @self.tree.command(name="reset", description="Réinitialise votre session")
         async def reset_command(interaction: discord.Interaction):
             """Réinitialise la session de l'utilisateur"""
             self.session_manager.reset_session(interaction.user.id)
-            await interaction.response.send_message(
-                "✅ Session réinitialisée ! Utilisez `/branding`, `/gamemaster`, `/webradio` ou `/organisation` pour commencer."
+
+            embed = create_embed(
+                title="🔄 Session Réinitialisée",
+                description=(
+                    "**Votre session a été réinitialisée avec succès !**\n\n"
+                    "Vous pouvez maintenant commencer un nouveau mode d'entraînement :\n\n"
+                    "🎨 `/branding` - Clients Web/Graphisme\n"
+                    "🎲 `/gamemaster` - Maître du Jeu JDR\n"
+                    "📻 `/webradio` - Partenaire WebRadio\n"
+                    "📋 `/organisation` - Client Organisation\n\n"
+                    "Utilisez `/help` pour plus d'informations."
+                ),
+                color_key="success"
             )
+
+            await interaction.response.send_message(embed=embed)
 
         @self.tree.command(name="help", description="Affiche l'aide et les commandes disponibles")
         async def help_command(interaction: discord.Interaction):
             """Affiche l'aide"""
-            help_text = """
-# 🤖 Bot d'Entraînement Commercial
+            embed = discord.Embed(
+                title="🤖 Bot d'Entraînement Commercial",
+                description="Simulateur de clients pénibles pour améliorer vos compétences commerciales",
+                color=MODE_COLORS["default"]
+            )
 
-Ce bot simule des clients pénibles pour vous aider à améliorer vos compétences commerciales.
+            embed.add_field(
+                name="📋 Commandes Disponibles",
+                value=(
+                    "🎨 `/branding` - Clients Web/Graphisme (3 personas)\n"
+                    "🎲 `/gamemaster` - Maître du Jeu JDR\n"
+                    "📻 `/webradio` - Partenaire WebRadio\n"
+                    "📋 `/organisation` - Client Organisation\n"
+                    "🔄 `/reset` - Réinitialiser la session\n"
+                    "❓ `/help` - Afficher cette aide"
+                ),
+                inline=False
+            )
 
-## 📋 Commandes disponibles :
+            embed.add_field(
+                name="💡 Comment ça marche ?",
+                value=(
+                    "**1.** Choisissez un mode avec une commande slash\n"
+                    "**2.** Le bot incarnera un client sceptique et exigeant\n"
+                    "**3.** Défendez votre produit/service face aux objections\n"
+                    "**4.** Recevez un score et des conseils à la fin"
+                ),
+                inline=False
+            )
 
-- `/branding` - Mode Branding avec 3 personas (Clara, Antoine, Julie)
-- `/gamemaster` - Mode Game Master JDR (illustrations IA)
-- `/webradio` - Mode Partenaire WebRadio (sponsoring)
-- `/organisation` - Mode Client Organisation/Productivité (Plan Bzz)
-- `/reset` - Réinitialise votre session
-- `/help` - Affiche cette aide
+            embed.add_field(
+                name="🎯 Objectif",
+                value=(
+                    "Améliorer votre pitch, gérer les objections, "
+                    "et convaincre même les clients les plus difficiles !"
+                ),
+                inline=False
+            )
 
-## 💡 Comment ça marche ?
+            embed.set_footer(text="Bonne chance dans vos entraînements commerciaux !")
 
-1. Choisissez un mode avec une commande slash
-2. Le bot incarnera un client sceptique et exigeant
-3. Défendez votre produit/service face aux objections
-4. Recevez un score et des conseils à la fin
-
-## 🎯 Objectif :
-
-Améliorer votre pitch, gérer les objections, et convaincre même les clients les plus difficiles !
-"""
-            await interaction.response.send_message(help_text)
+            await interaction.response.send_message(embed=embed)
 
     async def setup_hook(self):
         """Configuration initiale du bot"""
@@ -183,19 +290,74 @@ Améliorer votre pitch, gérer les objections, et convaincre même les clients l
         if message.type != discord.MessageType.default and message.type != discord.MessageType.reply:
             return
 
-        # Ignorer les messages qui sont des commandes
+        # Ignorer et aider pour les commandes slash
         if message.content.startswith('/'):
+            # Extraire le nom de la commande
+            command_name = message.content.split()[0][1:].lower()
+            valid_commands = ["branding", "gamemaster", "webradio", "organisation", "reset", "help"]
+
+            if command_name not in valid_commands:
+                embed = create_embed(
+                    title="❌ Commande Inconnue",
+                    description=(
+                        f"La commande `/{command_name}` n'existe pas.\n\n"
+                        "**Commandes disponibles :**\n"
+                        "• `/branding` - Mode Branding\n"
+                        "• `/gamemaster` - Mode Game Master\n"
+                        "• `/webradio` - Mode WebRadio\n"
+                        "• `/organisation` - Mode Organisation\n"
+                        "• `/reset` - Réinitialiser\n"
+                        "• `/help` - Aide complète"
+                    ),
+                    color_key="error"
+                )
+                await message.reply(embed=embed)
             return
 
         # Récupérer ou créer la session utilisateur
         session = self.session_manager.get_session(message.author.id)
 
+        # Valider la longueur du message
+        is_valid, error_msg = session.validate_message_length(message.content)
+        if not is_valid:
+            embed = create_embed(
+                title="❌ Message Invalide",
+                description=f"{error_msg}\n\nVeuillez envoyer un message plus court.",
+                color_key="error"
+            )
+            await message.reply(embed=embed)
+            return
+
+        # Vérifier le rate limit
+        if not session.check_rate_limit():
+            embed = create_embed(
+                title="⏰ Ralentissez !",
+                description=(
+                    "Vous envoyez trop de messages trop rapidement.\n\n"
+                    "Veuillez attendre quelques instants avant de réessayer."
+                ),
+                color_key="error",
+                footer="Protection anti-spam • Attendez 1 minute"
+            )
+            await message.reply(embed=embed)
+            return
+
         # Si pas de mode actif, ignorer
         if not session.current_mode:
-            await message.reply(
-                "👋 Utilisez `/help` pour voir les modes disponibles !\n"
-                "Commencez par `/branding`, `/gamemaster`, `/webradio` ou `/organisation`"
+            embed = create_embed(
+                title="👋 Bienvenue !",
+                description=(
+                    "Aucun mode n'est actif pour le moment.\n\n"
+                    "**Commencez votre entraînement avec l'une de ces commandes :**\n\n"
+                    "🎨 `/branding` - Clients Web/Graphisme\n"
+                    "🎲 `/gamemaster` - Maître du Jeu JDR\n"
+                    "📻 `/webradio` - Partenaire WebRadio\n"
+                    "📋 `/organisation` - Client Organisation\n\n"
+                    "Utilisez `/help` pour plus d'informations."
+                ),
+                color_key="default"
             )
+            await message.reply(embed=embed)
             return
 
         # Gérer la sélection de persona pour Branding
@@ -206,15 +368,37 @@ Améliorer votre pitch, gérer les objections, et convaincre même les clients l
             if persona_key:
                 # Sélection valide
                 session.current_mode.set_persona(persona_key)
-                await message.reply(
-                    f"✅ **Persona sélectionné : {session.current_mode.get_mode_name()}**\n\n"
-                    "Présentez votre offre de branding. Je vais la challenger."
+
+                # Descriptions des personas
+                persona_descriptions = {
+                    "clara": "Créatif·ve épuisé·e qui cherche simplicité et accompagnement. Je suis submergé·e et j'ai besoin qu'on me guide.",
+                    "antoine": "Entrepreneur expérimenté qui cherche vision et ROI clair. Je veux comprendre le vrai impact de votre offre.",
+                    "julie": "Client pressé et exigeant qui teste votre autorité. Je n'ai pas de temps à perdre avec du flou."
+                }
+
+                embed = create_embed(
+                    title=f"✅ Persona : {session.current_mode.get_mode_name()}",
+                    description=(
+                        f"**Persona activé avec succès !**\n\n"
+                        f"{persona_descriptions.get(persona_key, '')}\n\n"
+                        "Présentez-moi votre offre de branding. Je vais la challenger."
+                    ),
+                    color_key="branding"
                 )
+                await message.reply(embed=embed)
             else:
                 # Sélection invalide
-                await message.reply(
-                    "❌ Persona invalide. Veuillez choisir : `clara`, `antoine`, ou `julie`"
+                embed = create_embed(
+                    title="❌ Persona Invalide",
+                    description=(
+                        "Veuillez choisir un persona valide :\n\n"
+                        "• `clara` - L'Équilibriste Épuisé·e\n"
+                        "• `antoine` - Le Stratège Lucide\n"
+                        "• `julie` - Le Sceptique Dominant"
+                    ),
+                    color_key="error"
                 )
+                await message.reply(embed=embed)
             return
 
         # Traiter le message avec le mode actif
@@ -243,9 +427,19 @@ Améliorer votre pitch, gérer les objections, et convaincre même les clients l
             print(f"❌ Erreur lors du traitement du message : {e}")
             import traceback
             traceback.print_exc()
-            await message.reply(
-                "❌ Désolé, une erreur s'est produite. Réessayez dans quelques instants."
+
+            embed = create_embed(
+                title="❌ Erreur",
+                description=(
+                    "Désolé, une erreur s'est produite lors du traitement de votre message.\n\n"
+                    "**Que faire ?**\n"
+                    "• Réessayez dans quelques instants\n"
+                    "• Si le problème persiste, utilisez `/reset` pour réinitialiser votre session\n"
+                    "• Utilisez `/help` pour voir les commandes disponibles"
+                ),
+                color_key="error"
             )
+            await message.reply(embed=embed)
 
 
 def create_bot() -> SalesChallengeBot:
