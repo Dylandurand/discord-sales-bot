@@ -42,6 +42,68 @@ def create_embed(title: str, description: str, color_key: str = "default", foote
     return embed
 
 
+def split_message(message: str, max_length: int = 2000) -> list[str]:
+    """
+    Découpe un message en plusieurs parties si nécessaire.
+
+    Args:
+        message: Le message à découper
+        max_length: Longueur maximale par message (défaut: 2000 pour Discord)
+
+    Returns:
+        Liste de messages découpés intelligemment
+    """
+    # Si le message est déjà assez court
+    if len(message) <= max_length:
+        return [message]
+
+    chunks = []
+    current_chunk = ""
+
+    # Découper par paragraphes d'abord (double saut de ligne)
+    paragraphs = message.split('\n\n')
+
+    for paragraph in paragraphs:
+        # Si le paragraphe seul est trop long, le découper par phrases
+        if len(paragraph) > max_length:
+            sentences = paragraph.replace('. ', '.\n').split('\n')
+
+            for sentence in sentences:
+                # Si une seule phrase est trop longue, découper brutalement
+                if len(sentence) > max_length:
+                    # Découper en morceaux de max_length
+                    for i in range(0, len(sentence), max_length - 3):
+                        chunk_part = sentence[i:i + max_length - 3]
+                        if i + max_length - 3 < len(sentence):
+                            chunk_part += "..."
+                        chunks.append(chunk_part)
+                    continue
+
+                # Vérifier si on peut ajouter la phrase au chunk actuel
+                if len(current_chunk) + len(sentence) + 1 <= max_length:
+                    current_chunk += sentence + ' '
+                else:
+                    # Sauvegarder le chunk actuel et commencer un nouveau
+                    if current_chunk:
+                        chunks.append(current_chunk.strip())
+                    current_chunk = sentence + ' '
+        else:
+            # Vérifier si on peut ajouter le paragraphe au chunk actuel
+            if len(current_chunk) + len(paragraph) + 2 <= max_length:
+                current_chunk += paragraph + '\n\n'
+            else:
+                # Sauvegarder le chunk actuel et commencer un nouveau
+                if current_chunk:
+                    chunks.append(current_chunk.strip())
+                current_chunk = paragraph + '\n\n'
+
+    # Ajouter le dernier chunk
+    if current_chunk:
+        chunks.append(current_chunk.strip())
+
+    return chunks if chunks else [message[:max_length]]
+
+
 class SalesChallengeBot(discord.Client):
     """Bot Discord pour l'entraînement commercial"""
 
@@ -426,6 +488,18 @@ class SalesChallengeBot(discord.Client):
                     ai_client=self.ai_client
                 )
 
+            # Logger la réponse de l'IA pour débogage
+            print(f"\n{'='*80}")
+            print(f"🤖 Réponse IA générée pour {message.author.name}")
+            print(f"📏 Longueur : {len(response)} caractères")
+            if len(response) > 2000:
+                print(f"⚠️  Message long détecté ! Sera découpé en {(len(response) // 2000) + 1} parties")
+            print(f"\n📝 RÉPONSE COMPLÈTE :")
+            print(f"{'-'*80}")
+            print(response)
+            print(f"{'-'*80}\n")
+            print(f"{'='*80}\n")
+
             # Ajouter le message utilisateur et la réponse à l'historique
             session.add_message("user", message.content)
             session.add_message("assistant", response)
@@ -434,8 +508,15 @@ class SalesChallengeBot(discord.Client):
             if session.current_mode.should_end_session(response):
                 response += "\n\n✅ **Session terminée !** Utilisez `/reset` pour recommencer."
 
-            # Envoyer la réponse
-            await message.reply(response)
+            # Découper la réponse si elle dépasse 2000 caractères
+            message_chunks = split_message(response, max_length=2000)
+
+            # Envoyer le premier message en réponse
+            await message.reply(message_chunks[0])
+
+            # Envoyer les messages suivants (s'il y en a) dans le même canal
+            for chunk in message_chunks[1:]:
+                await message.channel.send(chunk)
 
         except Exception as e:
             print(f"❌ Erreur lors du traitement du message : {e}")
