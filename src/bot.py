@@ -56,6 +56,10 @@ class SalesChallengeBot(discord.Client):
         self.session_manager = SessionManager()
         self.ai_client = AIClient()
 
+        # Configurer le canal autorisé (optionnel)
+        allowed_channel = os.getenv('ALLOWED_CHANNEL_ID', '').strip()
+        self.allowed_channel_id = int(allowed_channel) if allowed_channel and allowed_channel.isdigit() else None
+
         # Initialiser l'arbre de commandes slash
         self.tree = app_commands.CommandTree(self)
 
@@ -259,6 +263,12 @@ class SalesChallengeBot(discord.Client):
         model_info = self.ai_client.get_model_info()
         print(f"🤖 Modèle IA : {model_info['model']} ({model_info['provider']})")
 
+        # Afficher le canal autorisé (si configuré)
+        if self.allowed_channel_id:
+            print(f"📍 Canal autorisé : {self.allowed_channel_id}")
+        else:
+            print("📍 Tous les canaux sont autorisés")
+
         # Synchroniser les commandes slash avec Discord (par serveur = instantané)
         print("🔄 Synchronisation des commandes slash...")
 
@@ -289,6 +299,10 @@ class SalesChallengeBot(discord.Client):
         # Ignorer les messages système (ajout de bot, pins, etc.)
         if message.type != discord.MessageType.default and message.type != discord.MessageType.reply:
             return
+
+        # Vérifier si le message provient du canal autorisé (si configuré)
+        if self.allowed_channel_id and message.channel.id != self.allowed_channel_id:
+            return  # Ignorer silencieusement les messages des autres canaux
 
         # Ignorer et aider pour les commandes slash
         if message.content.startswith('/'):
