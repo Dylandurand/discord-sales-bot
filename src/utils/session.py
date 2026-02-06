@@ -2,16 +2,19 @@
 Gestion des sessions utilisateur
 """
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, TYPE_CHECKING
 import os
+
+if TYPE_CHECKING:
+    from ..modes.base_mode import BaseMode
 
 
 class UserSession:
     """Représente une session utilisateur avec son historique de conversation"""
-    
+
     def __init__(self, user_id: int):
         self.user_id = user_id
-        self.current_mode = None  # Mode actif (1-4 ou None pour défaut)
+        self.current_mode: Optional['BaseMode'] = None  # Mode actif (instance de BaseMode)
         self.conversation_history: List[Dict[str, str]] = []
         self.started_at = datetime.now()
         self.last_activity = datetime.now()
@@ -35,8 +38,13 @@ class UserSession:
             keep_count = max_history - len(system_messages)
             self.conversation_history = system_messages + user_messages[-keep_count:]
     
-    def set_mode(self, mode: Optional[int]):
-        """Change le mode actif"""
+    def set_mode(self, mode: Optional['BaseMode']):
+        """
+        Change le mode actif.
+
+        Args:
+            mode: Instance de BaseMode ou None pour désactiver le mode
+        """
         self.current_mode = mode
         
     def reset(self):
