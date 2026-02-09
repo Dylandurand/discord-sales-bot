@@ -1,1 +1,3 @@
-"""Tests module"""
+"""
+Tests module - Tests unitaires et d'intégration
+"""

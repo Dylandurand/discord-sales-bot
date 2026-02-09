@@ -38,12 +38,9 @@ def main():
     print("✅ Configuration validée")
     print("🚀 Démarrage du bot...")
 
-    # TODO: Importer et démarrer le bot
-    # from src.bot import start_bot
-    # start_bot()
-
-    print("\n⚠️  Le bot n'est pas encore complètement implémenté.")
-    print("📝 Consultez PLAN_DEV_BOT_DISCORD.md pour suivre le développement.")
+    # Importer et démarrer le bot
+    from src.bot import start_bot
+    start_bot()
 
 if __name__ == "__main__":
     try:
