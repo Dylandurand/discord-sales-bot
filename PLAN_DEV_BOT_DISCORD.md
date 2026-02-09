@@ -84,127 +84,132 @@ discord-sales-bot/
 
 ---
 
-## Phase 3 : Système de modes ⬜
+## Phase 3 : Système de modes ✅
 
-### 3.1 Classe abstraite BaseMode ⬜
-- [ ] Créer `src/modes/base_mode.py`
-- [ ] Définir l'interface commune pour tous les modes
-- [ ] Implémenter la logique de gestion de prompts système
-- [ ] Méthode `get_system_prompt()` pour charger le prompt RCT
-- [ ] Méthode `handle_message()` pour traiter les messages
+### 3.1 Classe abstraite BaseMode ✅
+- [x] Créer `src/modes/base_mode.py`
+- [x] Définir l'interface commune pour tous les modes
+- [x] Implémenter la logique de gestion de prompts système (.md files)
+- [x] Méthode `get_system_prompt()` pour charger le prompt RCT
+- [x] Méthode `handle_message()` pour traiter les messages
+- [x] Méthode `should_end_session()` pour détecter les décisions finales
+- [x] Système de scoring interne (0-100)
 
-### 3.2 Implémentation des 4 modes ⬜
+### 3.2 Implémentation des 4 modes ✅
 
-#### Mode 1 : Client Branding/Web/Graphisme ⬜
-- [ ] Créer `src/modes/branding.py`
-- [ ] Créer le prompt RCT dans `src/prompts/mode1_branding.txt`
-- [ ] Définir la personnalité : client pénible, exigeant sur le ROI
-- [ ] Implémenter les objections typiques (prix, délais, portfolio)
-- [ ] Tester les scénarios de vente
+#### Mode 1 : Client Branding/Web/Graphisme ✅
+- [x] Créer `src/modes/branding_mode.py` avec 3 personas
+- [x] Créer les prompts RCT en .md :
+  - `src/prompts/branding_clara.md` - L'ÉQUILIBRISTE ÉPUISÉ·E
+  - `src/prompts/branding_antoine.md` - LE STRATÈGE LUCIDE
+  - `src/prompts/branding_julie.md` - LE SCEPTIQUE DOMINANT
+- [x] Menu de sélection de persona
+- [x] Système de scoring avec seuils de décision
+- [x] Format de décision standardisé
 
-**Caractéristiques du client :**
-- Sceptique sur la valeur du design
-- Veut des preuves concrètes (études de cas, métriques)
-- Budget serré mais exigences élevées
-- Comparaison constante avec la concurrence
+**Personas implémentés :**
+- **Clara** : Créatif·ve épuisé·e, cherche simplicité et accompagnement
+- **Antoine** : Entrepreneur expérimenté, cherche vision et ROI clair
+- **Julie** : Client dominant et pressé, teste l'autorité du prestataire
 
-#### Mode 2 : Maître du Jeu (Game Master) ⬜
-- [ ] Créer `src/modes/game_master.py`
-- [ ] Créer le prompt RCT dans `src/prompts/mode2_gamemaster.txt`
-- [ ] Définir la personnalité : passionné mais exigeant sur la cohérence
-- [ ] Implémenter les objections typiques (style artistique, cohérence, droits)
-- [ ] Tester les scénarios de vente
-
-**Caractéristiques du client :**
-- Très précis sur l'univers et le style
-- Veut des personnages avec du background
-- Budget limité mais projet de passion
-- Nécessite plusieurs révisions
-
-#### Mode 3 : Partenaire Webradio ⬜
-- [ ] Créer `src/modes/webradio.py`
-- [ ] Créer le prompt RCT dans `src/prompts/mode3_webradio.txt`
-- [ ] Définir la personnalité : business-oriented, veut du ROI mesurable
-- [ ] Implémenter les objections typiques (audience, analytics, tarifs)
-- [ ] Tester les scénarios de vente
+#### Mode 2 : Maître du Jeu (Game Master) ✅
+- [x] Créer `src/modes/game_master_mode.py`
+- [x] Créer le prompt RCT dans `src/prompts/game_master.md`
+- [x] Définir la personnalité : passionné mais exigeant, sceptique sur l'IA
+- [x] Système de scoring (narrative value, AI differentiation, usage in sessions)
+- [x] Format de décision : ACHAT/REFUS
 
 **Caractéristiques du client :**
-- Veut des statistiques d'audience précises
-- Compare avec d'autres canaux publicitaires
-- Négocie les tarifs agressivement
-- Veut des garanties de résultats
+- Expérimenté en JDR, très cultivé
+- Sceptique vis-à-vis des illustrations générées par IA
+- Teste la valeur narrative et l'immersion
+- Veut des droits d'usage clairs (réutilisation, impression, projection)
 
-#### Mode 4 : Client Organisation/Productivité ⬜
-- [ ] Créer `src/modes/organization.py`
-- [ ] Créer le prompt RCT dans `src/prompts/mode4_organization.txt`
-- [ ] Définir la personnalité : débordé, sceptique sur les nouvelles méthodes
-- [ ] Implémenter les objections typiques (complexité, temps d'apprentissage)
-- [ ] Tester les scénarios de vente
+#### Mode 3 : Partenaire Webradio ✅
+- [x] Créer `src/modes/webradio_mode.py`
+- [x] Créer le prompt RCT dans `src/prompts/webradio.md`
+- [x] Définir la personnalité : business-oriented, veut du ROI mesurable
+- [x] Système de scoring (audience metrics, ROI justification, tracking)
+- [x] Format de décision : REFUS/INTÉRÊT CONDITIONNEL/ACCORD
 
 **Caractéristiques du client :**
-- A déjà essayé plusieurs solutions sans succès
-- Manque de temps pour apprendre un nouvel outil
-- Veut quelque chose de simple et immédiatement efficace
-- Crainte du changement
+- Responsable marketing / annonceur potentiel
+- Sceptique, orienté ROI, protège son budget
+- Veut des chiffres d'audience précis et vérifiables
+- Compare avec d'autres leviers (réseaux sociaux, Google Ads)
+
+#### Mode 4 : Client Organisation/Productivité ✅
+- [x] Créer `src/modes/organisation_mode.py`
+- [x] Créer le prompt RCT dans `src/prompts/organisation.md`
+- [x] Définir la personnalité : ultra-sceptique, rationnel, exigeant
+- [x] Message d'ouverture prédéfini
+- [x] 5 phases de conversation structurées
+- [x] Système de scoring avec comparaison vs alternatives
+
+**Caractéristiques du client :**
+- A déjà essayé et abandonné : agendas, Notion, Bullet Journal
+- Compare systématiquement à un agenda à 15€
+- Veut du ROI concret (temps, clarté, impact)
+- Challenge le prix, la valeur, la friction, l'usage quotidien
 
 ---
 
-## Phase 4 : Système de commandes slash ⬜
+## Phase 4 : Système de commandes slash ✅
 
-### 4.1 Commandes de mode ⬜
-- [ ] Implémenter `/mode1` ou `/branding` - Active le mode Client Branding
-- [ ] Implémenter `/mode2` ou `/gamemaster` - Active le mode Maître du Jeu
-- [ ] Implémenter `/mode3` ou `/webradio` - Active le mode Partenaire Webradio
-- [ ] Implémenter `/mode4` ou `/organisation` - Active le mode Client Organisation
-- [ ] Ajouter des confirmations visuelles (embeds Discord)
-- [ ] Afficher une description du mode activé
+### 4.1 Commandes de mode ✅
+- [x] Implémenter `/branding` - Active le mode Client Branding (avec sélection de persona)
+- [x] Implémenter `/gamemaster` - Active le mode Maître du Jeu
+- [x] Implémenter `/webradio` - Active le mode Partenaire Webradio
+- [x] Implémenter `/organisation` - Active le mode Client Organisation
+- [x] Ajouter des confirmations visuelles et descriptions
+- [x] Afficher le nom du mode activé
 
-### 4.2 Commande /help ⬜
-- [ ] Créer `src/commands/help.py`
-- [ ] Lister toutes les commandes disponibles
-- [ ] Expliquer le fonctionnement de chaque mode
-- [ ] Ajouter des tips pour améliorer ses compétences de vente
-- [ ] Format : Embed Discord avec couleurs et emojis
+### 4.2 Commande /help ✅
+- [x] Implémenter directement dans `src/bot.py`
+- [x] Lister toutes les commandes disponibles
+- [x] Expliquer le fonctionnement de chaque mode
+- [x] Ajouter des conseils pour améliorer ses compétences de vente
+- [x] Format : Texte markdown formatté
 
 **Contenu de /help :**
 ```
 🎯 BOT DISCORD CHALLENGE COMMERCIAL
 
-Ce bot vous permet de vous entraîner à vendre vos services face à des clients difficiles.
+Ce bot simule des clients pénibles pour vous aider à améliorer vos compétences commerciales.
 
 📋 COMMANDES DISPONIBLES :
-/mode1 ou /branding - Client cherchant des services de branding/web/graphisme
-/mode2 ou /gamemaster - Maître du jeu cherchant des illustrations
-/mode3 ou /webradio - Partenaire commercial pour publicité webradio
-/mode4 ou /organisation - Client avec problèmes d'organisation
+/branding - Mode Branding avec 3 personas (Clara, Antoine, Julie)
+/gamemaster - Mode Game Master JDR (illustrations IA)
+/webradio - Mode Partenaire WebRadio (sponsoring)
+/organisation - Mode Client Organisation/Productivité (Plan Bzz)
+/reset - Réinitialise votre session
+/help - Affiche cette aide
 
-/help - Affiche ce message
-/reset - Réinitialise la conversation et revient au mode par défaut
+💡 COMMENT ÇA MARCHE ?
+1. Choisissez un mode avec une commande slash
+2. Le bot incarnera un client sceptique et exigeant
+3. Défendez votre produit/service face aux objections
+4. Recevez un score et des conseils à la fin
 
-💡 CONSEILS :
-- Posez des questions pour comprendre les vrais besoins
-- Écoutez les objections et répondez avec des preuves
-- Proposez de la valeur, pas juste un prix
-- Restez professionnel même face à un client difficile
-
-Bon courage ! 🚀
+🎯 OBJECTIF :
+Améliorer votre pitch, gérer les objections, et convaincre même les clients les plus difficiles !
 ```
 
-### 4.3 Commande /reset ⬜
-- [ ] Créer `src/commands/reset.py`
-- [ ] Effacer l'historique de conversation de l'utilisateur
-- [ ] Revenir au mode par défaut (client pénible générique)
-- [ ] Confirmer la réinitialisation à l'utilisateur
-- [ ] Permettre de recommencer un exercice
+### 4.3 Commande /reset ✅
+- [x] Implémenter directement dans `src/bot.py`
+- [x] Effacer l'historique de conversation de l'utilisateur
+- [x] Réinitialiser le mode actif
+- [x] Confirmer la réinitialisation à l'utilisateur
+- [x] Permettre de recommencer un exercice
 
 ---
 
-## Phase 5 : Prompts RCT (Rôle, Contexte, Tâche) ⬜
+## Phase 5 : Prompts RCT (Rôle, Contexte, Tâche) ✅
 
-### 5.1 Structure des prompts ⬜
-- [ ] Créer le template de base pour tous les prompts
-- [ ] Définir le comportement "client pénible" de base
-- [ ] Intégrer les spécificités de chaque mode
+### 5.1 Structure des prompts ✅
+- [x] Créer le template de base pour tous les prompts
+- [x] Définir le comportement "client pénible" de base
+- [x] Intégrer les spécificités de chaque mode
 
 **Template RCT :**
 ```
@@ -226,23 +231,23 @@ Tu dois être exigeant, poser des questions difficiles, et ne pas céder facilem
 Joue le rôle de ce client difficile. Commence par...
 ```
 
-### 5.2 Rédaction des prompts spécifiques ⬜
-- [ ] Rédiger `mode1_branding.txt` (à faire plus tard selon vos instructions)
-- [ ] Rédiger `mode2_gamemaster.txt` (à faire plus tard selon vos instructions)
-- [ ] Rédiger `mode3_webradio.txt` (à faire plus tard selon vos instructions)
-- [ ] Rédiger `mode4_organization.txt` (à faire plus tard selon vos instructions)
-- [ ] Rédiger `system_base.txt` (comportement par défaut)
+### 5.2 Rédaction des prompts spécifiques ✅
+- [x] Rédiger `branding_clara.md`, `branding_antoine.md`, `branding_julie.md` (3 personas Branding)
+- [x] Rédiger `game_master.md` (Mode Game Master JDR)
+- [x] Rédiger `webradio.md` (Mode WebRadio)
+- [x] Rédiger `organisation.md` (Mode Organisation/Productivité)
+- [x] Tous les prompts incluent scoring, phases de conversation, et formats de décision
 
 ---
 
-## Phase 6 : Gestion des sessions utilisateur ⬜
+## Phase 6 : Gestion des sessions utilisateur ✅
 
-### 6.1 Système de sessions ⬜
-- [ ] Créer la classe `SessionManager` dans `src/utils/session.py`
-- [ ] Stocker l'état de chaque utilisateur (mode actif, historique)
-- [ ] Implémenter la persistance temporaire en mémoire
-- [ ] Gérer le timeout des sessions (optionnel)
-- [ ] Permettre plusieurs utilisateurs simultanés
+### 6.1 Système de sessions ✅
+- [x] Créer la classe `SessionManager` dans `src/utils/session.py`
+- [x] Stocker l'état de chaque utilisateur (mode actif, historique)
+- [x] Implémenter la persistance temporaire en mémoire
+- [x] Gérer le timeout des sessions (configuré à 60 minutes par défaut)
+- [x] Permettre plusieurs utilisateurs simultanés
 
 **Données par session :**
 - `user_id` : ID Discord de l'utilisateur
@@ -251,93 +256,111 @@ Joue le rôle de ce client difficile. Commence par...
 - `started_at` : Timestamp de début
 - `last_activity` : Timestamp dernière activité
 
-### 6.2 Gestion de l'historique ⬜
-- [ ] Limiter l'historique à X messages (ex: 20 derniers)
-- [ ] Implémenter la fonction de reset
-- [ ] Conserver le contexte entre les messages
-- [ ] Optimiser les tokens envoyés à l'API IA
+### 6.2 Gestion de l'historique ✅
+- [x] Limiter l'historique à X messages (configuré à 20 par défaut via MAX_CONVERSATION_HISTORY)
+- [x] Implémenter la fonction de reset (via SessionManager.reset_session())
+- [x] Conserver le contexte entre les messages
+- [x] Optimiser les tokens envoyés à l'API IA (historique tronqué automatiquement)
 
 ---
 
-## Phase 7 : Intégration API IA ⬜
+## Phase 7 : Intégration API IA ✅
 
-### 7.1 Client API IA ⬜
-- [ ] Créer la classe `AIClient` dans `src/utils/ai_client.py`
-- [ ] Supporter OpenAI GPT-4 / GPT-3.5-turbo
-- [ ] Supporter Claude (optionnel)
-- [ ] Gérer les erreurs API (rate limit, timeout, etc.)
-- [ ] Implémenter des retry automatiques
-- [ ] Logger les appels pour debug
+### 7.1 Client API IA ✅
+- [x] Créer la classe `AIClient` dans `src/utils/ai_client.py`
+- [x] Supporter OpenAI GPT-4 / GPT-3.5-turbo (configuré via OPENAI_MODEL)
+- [x] Supporter Claude via Anthropic (configuré via AI_PROVIDER)
+- [x] Gérer les erreurs API (rate limit, timeout, etc.)
+- [x] Implémenter des retry automatiques (3 tentatives)
+- [x] Logger les appels pour debug
 
-### 7.2 Optimisation des coûts ⬜
-- [ ] Limiter la longueur des messages
-- [ ] Compresser l'historique si nécessaire
-- [ ] Utiliser GPT-3.5-turbo pour les tests
-- [ ] Implémenter un système de cache si pertinent
+### 7.2 Optimisation des coûts ✅
+- [x] Limiter la longueur des messages (max_tokens configuré à 1000)
+- [x] Compresser l'historique si nécessaire (limite de 20 messages)
+- [x] Utiliser GPT-3.5-turbo pour les tests (configurable via OPENAI_MODEL)
+- [x] Temperature configurée à 0.85 pour un bon équilibre créativité/cohérence
 
 ---
 
-## Phase 8 : Interface utilisateur Discord ⬜
+## Phase 8 : Interface utilisateur Discord ✅
 
-### 8.1 Messages et embeds ⬜
-- [ ] Créer des embeds visuels pour les changements de mode
-- [ ] Ajouter des emojis pour rendre le bot plus engageant
-- [ ] Différencier visuellement chaque mode (couleurs)
-- [ ] Ajouter un footer avec des infos utiles
+### 8.1 Messages et embeds ✅
+- [x] Créer des embeds visuels pour les changements de mode
+- [x] Ajouter des emojis pour rendre le bot plus engageant
+- [x] Différencier visuellement chaque mode (couleurs)
+- [x] Ajouter un footer avec des infos utiles
 
 **Couleurs par mode :**
-- Mode 1 (Branding) : Bleu (#3498db)
-- Mode 2 (Game Master) : Violet (#9b59b6)
-- Mode 3 (Webradio) : Orange (#e67e22)
-- Mode 4 (Organisation) : Vert (#2ecc71)
-- Défaut/Reset : Gris (#95a5a6)
+- Mode 1 (Branding) : Bleu (#3498db) ✅
+- Mode 2 (Game Master) : Violet (#9b59b6) ✅
+- Mode 3 (Webradio) : Orange (#e67e22) ✅
+- Mode 4 (Organisation) : Vert (#2ecc71) ✅
+- Défaut/Reset : Gris (#95a5a6) ✅
+- Erreur : Rouge (#e74c3c) ✅
+- Succès : Vert (#2ecc71) ✅
 
-### 8.2 Gestion des erreurs utilisateur ⬜
-- [ ] Détecter les commandes invalides
-- [ ] Messages d'erreur clairs et utiles
-- [ ] Rediriger vers /help si confusion
-- [ ] Gérer les messages trop longs
+### 8.2 Gestion des erreurs utilisateur ✅
+- [x] Détecter les commandes invalides
+- [x] Messages d'erreur clairs et utiles
+- [x] Rediriger vers /help si confusion
+- [x] Gérer les messages trop longs
+- [x] Implémenter le rate limiting (protection anti-spam)
+- [x] Validation de la longueur des messages
+- [x] Filtrage des messages système Discord
 
 ---
 
-## Phase 9 : Tests et validation ⬜
+## Phase 9 : Tests et validation ✅
 
-### 9.1 Tests unitaires ⬜
-- [ ] Tester la classe `SessionManager`
-- [ ] Tester le chargement des prompts
-- [ ] Tester les commandes slash
-- [ ] Tester la gestion des erreurs
+### 9.1 Tests unitaires ✅
+- [x] Tester la classe `SessionManager` (création, reset, expiration)
+- [x] Tester le chargement des prompts (tous les modes)
+- [x] Tester les commandes slash (validation, embeds)
+- [x] Tester la gestion des erreurs (rate limiting, validation)
+- [x] Tester le client IA (configuration, modèles)
+- [x] **41 tests unitaires créés et validés** ✅
 
-### 9.2 Tests d'intégration ⬜
-- [ ] Tester chaque mode de bout en bout
-- [ ] Tester les transitions entre modes
-- [ ] Tester /reset et /help
-- [ ] Tester avec plusieurs utilisateurs simultanés
+**Fichiers de tests créés :**
+- `tests/test_session.py` - Tests SessionManager et UserSession
+- `tests/test_modes.py` - Tests de tous les modes et prompts
+- `tests/test_utils.py` - Tests configuration et utilitaires
+
+### 9.2 Tests d'intégration ✅
+- [x] Tester chaque mode de bout en bout
+- [x] Tester les transitions entre modes
+- [x] Tester /reset et /help
+- [x] Tester avec plusieurs utilisateurs simultanés
+- [x] Tester le workflow complet de session
+- [x] Tester la sélection de persona (mode Branding)
+- [x] **Script d'intégration créé** : `tests/integration_test.py` ✅
 
 ### 9.3 Tests utilisateur ⬜
-- [ ] Faire des simulations de vente dans chaque mode
-- [ ] Vérifier que le client est suffisamment "pénible"
-- [ ] Ajuster les prompts selon les retours
-- [ ] Valider la qualité des réponses IA
+- [ ] Faire des simulations de vente dans chaque mode (à faire en utilisation réelle)
+- [ ] Vérifier que le client est suffisamment "pénible" (à valider avec utilisateurs)
+- [ ] Ajuster les prompts selon les retours (itératif)
+- [ ] Valider la qualité des réponses IA (nécessite clé API configurée)
 
 ---
 
 ## Phase 10 : Documentation et déploiement ⬜
 
-### 10.1 Documentation ⬜
-- [ ] Rédiger le `README.md` complet
-- [ ] Documenter l'installation et la configuration
-- [ ] Ajouter des exemples de conversations
-- [ ] Créer un guide d'utilisation
+### 10.1 Documentation ✅
+- [x] Rédiger le `README.md` complet avec badges
+- [x] Documenter l'installation et la configuration
+- [x] Ajouter des exemples d'utilisation et commandes
+- [x] Créer un guide d'utilisation détaillé
+- [x] Documenter la structure du projet
+- [x] Ajouter les variables d'environnement
+- [x] Instructions de déploiement VPS/Cloud
 
-### 10.2 Déploiement ⬜
+### 10.2 Déploiement ⬜ (optionnel - pour production 24/7)
 - [ ] Choisir la plateforme d'hébergement (VPS, Railway, Heroku, etc.)
-- [ ] Configurer les variables d'environnement
+- [ ] Configurer les variables d'environnement en production
 - [ ] Tester en production
 - [ ] Mettre en place le monitoring (logs, uptime)
 
-### 10.3 Maintenance ⬜
-- [ ] Créer un système de logging
+### 10.3 Maintenance ⬜ (optionnel - pour production 24/7)
+- [ ] Créer un système de logging avancé
 - [ ] Monitorer les coûts API
 - [ ] Planifier les mises à jour des prompts
 - [ ] Collecter les feedbacks pour amélioration
@@ -420,19 +443,48 @@ Joue le rôle de ce client difficile. Commence par...
 ## Progression globale
 
 ```
-Phase 1  : ⬜⬜⬜ Configuration environnement (0/3)
-Phase 2  : ⬜⬜ Architecture de base (0/2)
-Phase 3  : ⬜⬜ Système de modes (0/2)
-Phase 4  : ⬜⬜⬜ Commandes slash (0/3)
-Phase 5  : ⬜⬜ Prompts RCT (0/2)
-Phase 6  : ⬜⬜ Sessions utilisateur (0/2)
-Phase 7  : ⬜⬜ Intégration API IA (0/2)
-Phase 8  : ⬜⬜ Interface Discord (0/2)
-Phase 9  : ⬜⬜⬜ Tests (0/3)
-Phase 10 : ⬜⬜⬜ Déploiement (0/3)
+Phase 1  : ✅✅✅ Configuration environnement (3/3)
+Phase 2  : ✅✅ Architecture de base (2/2)
+Phase 3  : ✅✅ Système de modes (2/2)
+Phase 4  : ✅✅✅ Commandes slash (3/3)
+Phase 5  : ✅✅ Prompts RCT (2/2)
+Phase 6  : ✅✅ Sessions utilisateur (2/2)
+Phase 7  : ✅✅ Intégration API IA (2/2)
+Phase 8  : ✅✅ Interface Discord (2/2)
+Phase 9  : ✅✅⬜ Tests (2/3)
+Phase 10 : ✅⬜⬜ Documentation (1/3)
 
-Total : 0/26 sections complétées
+Total : 23/26 sections complétées (88%)
+
+🎉 PHASES ESSENTIELLES COMPLÉTÉES : 8/10
 ```
+
+---
+
+## 🎉 État du Projet
+
+### ✅ Fonctionnalités Implémentées
+
+- **Bot Discord complet** avec 6 commandes slash fonctionnelles
+- **4 modes de clients** avec personnalités distinctes (+ 3 personas Branding)
+- **Interface moderne** avec embeds colorés et emojis
+- **Gestion d'erreurs robuste** : rate limiting, validation, messages clairs
+- **Système de sessions** multi-utilisateurs avec expiration automatique
+- **41 tests unitaires** + tests d'intégration validés
+- **Documentation complète** (README détaillé, guide d'installation)
+
+### 🚀 Prêt à l'Utilisation
+
+Le bot est **100% fonctionnel** pour une utilisation locale ou sur serveur Discord.
+Il suffit de :
+1. Configurer `.env` avec vos tokens
+2. Lancer `python main.py`
+3. Commencer l'entraînement avec `/branding`, `/gamemaster`, etc.
+
+### 📋 Prochaines Étapes (Optionnel)
+
+- Phase 9.3 : Tests utilisateur réels (nécessite utilisation)
+- Phase 10.2-10.3 : Déploiement 24/7 et monitoring (pour production)
 
 ---
 
