@@ -4,7 +4,7 @@ Un bot Discord d'entraînement commercial alimenté par l'IA qui simule des clie
 
 ![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)
 ![Discord.py](https://img.shields.io/badge/Discord.py-2.3+-7289DA.svg)
-![Tests](https://img.shields.io/badge/Tests-41%20passing-success.svg)
+![Tests](https://img.shields.io/badge/Tests-54%20passing-success.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 
 ## ✨ Fonctionnalités
@@ -15,7 +15,7 @@ Un bot Discord d'entraînement commercial alimenté par l'IA qui simule des clie
 - 📊 **Système de scoring** intégré dans chaque mode
 - 🔒 **Protection anti-spam** et rate limiting
 - 💾 **Gestion de sessions** multi-utilisateurs
-- ✅ **Tests complets** (41 tests unitaires + tests d'intégration)
+- ✅ **Tests complets** (54 tests unitaires + tests d'intégration)
 
 ## 📋 Description
 
@@ -28,7 +28,10 @@ Choisissez parmi 3 personas :
 - **Julie** - Le Sceptique Dominant : Client pressé qui teste votre autorité
 
 ### 🎲 Mode 2 : Game Master JDR
-Maître du jeu passionné mais exigeant, sceptique sur les illustrations IA. Teste la valeur narrative, l'authenticité et les droits d'usage.
+Choisissez parmi 3 personas :
+- **Gaël** - LE MAÎTRE EXIGEANT 🎲 : MJ expérimenté, cherche immersion et valeur narrative concrète
+- **Lyra** - LA BÂTISSEUSE D'UNIVERS 🌍 : Worldbuilder narratif, cherche cohérence du lore et outils multi-sensoriels
+- **Sylvan** - LE GARDIEN DU VIVANT 🌿 : World Builder conservation, ancre les créatures dans le vivant menacé
 
 ### 📻 Mode 3 : Partenaire WebRadio
 Responsable marketing orienté ROI qui veut des chiffres d'audience précis et des métriques de tracking avant d'investir son budget.
@@ -168,7 +171,9 @@ discord-sales-bot/
 │   │   ├── branding_clara.md
 │   │   ├── branding_antoine.md
 │   │   ├── branding_julie.md
-│   │   ├── game_master.md
+│   │   ├── game_master.md              # Gaël - LE MAÎTRE EXIGEANT
+│   │   ├── game_master_worldbuilder.md # Lyra - LA BÂTISSEUSE D'UNIVERS
+│   │   ├── game_master_conservation.md # Sylvan - LE GARDIEN DU VIVANT
 │   │   ├── webradio.md
 │   │   └── organisation.md
 │   └── utils/                  # Utilitaires
@@ -216,7 +221,7 @@ source venv/bin/activate
 python -m unittest discover tests -v
 ```
 
-Résultat attendu : **41 tests passing** ✅
+Résultat attendu : **54 tests passing** ✅
 
 ### Lancer les tests d'intégration
 
@@ -241,6 +246,7 @@ Le bot gère automatiquement :
 - ❌ **Commandes invalides** : Redirection automatique vers `/help`
 - ❌ **Messages système Discord** : Filtrés automatiquement
 - ❌ **Erreurs API** : Retry automatique et messages d'erreur clairs
+- ❌ **Interactions Discord expirées** : Gestion silencieuse des tokens stale (erreur 10062)
 
 ## 📝 Développement
 
@@ -252,10 +258,11 @@ Les contributions sont les bienvenues ! Consultez `PLAN_DEV_BOT_DISCORD.md` pour
 - ✅ Phase 1-7 : Configuration, architecture, modes, API IA
 - ✅ Phase 8 : Interface Discord avec embeds et gestion d'erreurs
 - ✅ Phase 9 : Tests unitaires et d'intégration
+- ✅ Phase 10 : Système de personas multi-niveaux pour Game Master (Gaël, Lyra, Sylvan)
 
 **Prochaines étapes** :
-- 📋 Phase 10 : Documentation et déploiement
-- 🚀 Phase 11 : Fonctionnalités avancées (statistiques, leaderboard)
+- 📋 Phase 11 : Documentation et déploiement
+- 🚀 Phase 12 : Fonctionnalités avancées (statistiques, leaderboard)
 
 ### Ajouter un nouveau mode
 
