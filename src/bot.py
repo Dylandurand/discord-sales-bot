@@ -131,9 +131,27 @@ class SalesChallengeBot(discord.Client):
     def _register_commands(self):
         """Enregistre toutes les commandes slash"""
 
+        @self.tree.error
+        async def on_app_command_error(
+            interaction: discord.Interaction,
+            error: app_commands.AppCommandError
+        ):
+            """Gestion globale des erreurs de commandes slash"""
+            import logging
+            logger = logging.getLogger(__name__)
+
+            # Interaction expirée (bot redémarré ou latence réseau) : ignorer silencieusement
+            if isinstance(error, app_commands.CommandInvokeError):
+                if isinstance(error.original, discord.NotFound) and error.original.code == 10062:
+                    logger.debug("Interaction expirée (10062) ignorée silencieusement")
+                    return
+
+            logger.error(f"Erreur non gérée dans une commande slash : {error}", exc_info=error)
+
         @self.tree.command(name="branding", description="Mode Branding avec sélection de persona")
         async def branding_command(interaction: discord.Interaction):
             """Démarre le mode Branding avec menu de sélection de persona"""
+            await interaction.response.defer()
             session = self.session_manager.get_session(interaction.user.id)
 
             # Créer un mode Branding sans persona (affichera le menu)
@@ -160,11 +178,12 @@ class SalesChallengeBot(discord.Client):
                 footer="Choisissez votre persona en tapant son prénom dans le chat"
             )
 
-            await interaction.response.send_message(embed=embed)
+            await interaction.followup.send(embed=embed)
 
         @self.tree.command(name="gamemaster", description="Mode Game Master JDR avec sélection de persona")
         async def gamemaster_command(interaction: discord.Interaction):
             """Démarre le mode Game Master avec menu de sélection de persona"""
+            await interaction.response.defer()
             session = self.session_manager.get_session(interaction.user.id)
 
             # Créer un mode Game Master sans persona (affichera le menu)
@@ -182,17 +201,21 @@ class SalesChallengeBot(discord.Client):
                     "*Tapez : `gael`*\n\n"
                     "**2️⃣ Lyra - LA BÂTISSEUSE D'UNIVERS** 🌍\n"
                     "Worldbuilder narratif, cherche cohérence du lore et outils multi-sensoriels.\n"
-                    "*Tapez : `lyra`*"
+                    "*Tapez : `lyra`*\n\n"
+                    "**3️⃣ Sylvan - LE GARDIEN DU VIVANT** 🌿\n"
+                    "World Builder conservation, ancre les créatures dans le vivant menacé.\n"
+                    "*Tapez : `sylvan`*"
                 ),
                 color_key="gamemaster",
                 footer="Choisissez votre persona en tapant son prénom dans le chat"
             )
 
-            await interaction.response.send_message(embed=embed)
+            await interaction.followup.send(embed=embed)
 
         @self.tree.command(name="webradio", description="Mode Partenaire WebRadio")
         async def webradio_command(interaction: discord.Interaction):
             """Démarre le mode WebRadio"""
+            await interaction.response.defer()
             session = self.session_manager.get_session(interaction.user.id)
 
             # Créer et configurer le mode
@@ -215,11 +238,12 @@ class SalesChallengeBot(discord.Client):
                 color_key="webradio"
             )
 
-            await interaction.response.send_message(embed=embed)
+            await interaction.followup.send(embed=embed)
 
         @self.tree.command(name="organisation", description="Mode Client Organisation/Productivité (Plan Bzz)")
         async def organisation_command(interaction: discord.Interaction):
             """Démarre le mode Organisation"""
+            await interaction.response.defer()
             session = self.session_manager.get_session(interaction.user.id)
 
             # Créer et configurer le mode
@@ -242,11 +266,12 @@ class SalesChallengeBot(discord.Client):
                 color_key="organisation"
             )
 
-            await interaction.response.send_message(embed=embed)
+            await interaction.followup.send(embed=embed)
 
         @self.tree.command(name="reset", description="Réinitialise votre session")
         async def reset_command(interaction: discord.Interaction):
             """Réinitialise la session de l'utilisateur"""
+            await interaction.response.defer()
             self.session_manager.reset_session(interaction.user.id)
 
             embed = create_embed(
@@ -263,11 +288,12 @@ class SalesChallengeBot(discord.Client):
                 color_key="success"
             )
 
-            await interaction.response.send_message(embed=embed)
+            await interaction.followup.send(embed=embed)
 
         @self.tree.command(name="help", description="Affiche l'aide et les commandes disponibles")
         async def help_command(interaction: discord.Interaction):
             """Affiche l'aide"""
+            await interaction.response.defer()
             embed = discord.Embed(
                 title="🤖 Bot d'Entraînement Commercial",
                 description="Simulateur de clients pénibles pour améliorer vos compétences commerciales",
@@ -278,7 +304,7 @@ class SalesChallengeBot(discord.Client):
                 name="📋 Commandes Disponibles",
                 value=(
                     "🎨 `/branding` - Clients Web/Graphisme (3 personas)\n"
-                    "🎲 `/gamemaster` - Maître du Jeu JDR (2 personas)\n"
+                    "🎲 `/gamemaster` - Maître du Jeu JDR (3 personas)\n"
                     "📻 `/webradio` - Partenaire WebRadio\n"
                     "📋 `/organisation` - Client Organisation\n"
                     "🔄 `/reset` - Réinitialiser la session\n"
@@ -309,7 +335,7 @@ class SalesChallengeBot(discord.Client):
 
             embed.set_footer(text="Bonne chance dans vos entraînements commerciaux !")
 
-            await interaction.response.send_message(embed=embed)
+            await interaction.followup.send(embed=embed)
 
     async def setup_hook(self):
         """Configuration initiale du bot"""
@@ -490,7 +516,8 @@ class SalesChallengeBot(discord.Client):
                 # Descriptions des personas
                 persona_descriptions = {
                     "gael": "MJ expérimenté passionné mais exigeant. Je cherche de l'immersion et une vraie valeur narrative, pas juste du joli.",
-                    "lyra": "Worldbuilder narratif pointilleux. Je conçois des univers sur le long terme et j'ai besoin de cohérence totale et d'outils multi-sensoriels."
+                    "lyra": "Worldbuilder narratif pointilleux. Je conçois des univers sur le long terme et j'ai besoin de cohérence totale et d'outils multi-sensoriels.",
+                    "sylvan": "World Builder orienté conservation. J'ancre chaque créature dans le vivant menacé et je n'achète que si l'offre honore le vivant et sert le jeu."
                 }
 
                 embed = create_embed(
@@ -510,7 +537,8 @@ class SalesChallengeBot(discord.Client):
                     description=(
                         "Veuillez choisir un persona valide :\n\n"
                         "• `gael` - LE MAÎTRE EXIGEANT 🎲\n"
-                        "• `lyra` - LA BÂTISSEUSE D'UNIVERS 🌍"
+                        "• `lyra` - LA BÂTISSEUSE D'UNIVERS 🌍\n"
+                        "• `sylvan` - LE GARDIEN DU VIVANT 🌿"
                     ),
                     color_key="error"
                 )

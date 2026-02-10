@@ -24,6 +24,12 @@ class GameMasterMode(BaseMode):
             "prompt_file": "game_master_worldbuilder.md",
             "description": "Worldbuilder narratif, cherche cohérence du lore et outils multi-sensoriels",
             "emoji": "🌍"
+        },
+        "sylvan": {
+            "name": "Sylvan - LE GARDIEN DU VIVANT",
+            "prompt_file": "game_master_conservation.md",
+            "description": "World Builder conservation, ancre les créatures dans le vivant menacé",
+            "emoji": "🌿"
         }
     }
 
@@ -97,7 +103,7 @@ class GameMasterMode(BaseMode):
             menu += f"**{persona['emoji']} {key.upper()}** - {persona['name']}\n"
             menu += f"_{persona['description']}_\n\n"
 
-        menu += "\n📝 **Pour sélectionner un persona, tapez son nom** : `gael` ou `lyra`"
+        menu += "\n📝 **Pour sélectionner un persona, tapez son nom** : `gael`, `lyra` ou `sylvan`"
 
         return menu
 
@@ -117,7 +123,7 @@ class GameMasterMode(BaseMode):
             menu += f"**{persona['emoji']} {key.upper()}** - {persona['name']}\n"
             menu += f"_{persona['description']}_\n\n"
 
-        menu += "\n📝 **Pour sélectionner un persona, tapez son nom** : `gael` ou `lyra`"
+        menu += "\n📝 **Pour sélectionner un persona, tapez son nom** : `gael`, `lyra` ou `sylvan`"
 
         return menu
 
