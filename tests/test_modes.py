@@ -85,6 +85,9 @@ class TestGameMasterMode(unittest.TestCase):
         self.assertEqual(GameMasterMode.get_persona_key("Gael"), "gael")
         self.assertEqual(GameMasterMode.get_persona_key("LYRA"), "lyra")
         self.assertEqual(GameMasterMode.get_persona_key("lyra"), "lyra")
+        self.assertEqual(GameMasterMode.get_persona_key("sylvan"), "sylvan")
+        self.assertEqual(GameMasterMode.get_persona_key("SYLVAN"), "sylvan")
+        self.assertEqual(GameMasterMode.get_persona_key("Sylvan"), "sylvan")
 
         # Test des clés invalides
         self.assertIsNone(GameMasterMode.get_persona_key("invalid"))
@@ -105,6 +108,13 @@ class TestGameMasterMode(unittest.TestCase):
 
         self.assertTrue(mode2.persona_selected)
         self.assertIn("Lyra", mode2.get_mode_name())
+
+        # Test avec le persona conservation
+        mode3 = GameMasterMode()
+        mode3.set_persona("sylvan")
+
+        self.assertTrue(mode3.persona_selected)
+        self.assertIn("Sylvan", mode3.get_mode_name())
 
     def test_set_persona_invalid(self):
         """Test de la configuration d'un persona invalide"""
@@ -153,19 +163,39 @@ class TestGameMasterMode(unittest.TestCase):
         # Vérifier que le prompt contient des mots-clés du worldbuilder
         self.assertIn("world builder", prompt.lower())
 
+    def test_get_system_prompt_conservation(self):
+        """Test du chargement du prompt conservation (Sylvan)"""
+        mode = GameMasterMode()
+        mode.set_persona("sylvan")
+
+        prompt = mode.get_system_prompt()
+
+        self.assertIsNotNone(prompt)
+        self.assertIsInstance(prompt, str)
+        self.assertGreater(len(prompt), 0)
+        # Vérifier que le prompt contient des mots-clés de la conservation
+        self.assertIn("conservation", prompt.lower())
+
     def test_get_initial_message(self):
         """Test du message initial"""
-        # Sans persona - devrait retourner le menu
+        # Sans persona - devrait retourner le menu avec les trois personas
         mode = GameMasterMode()
         msg = mode.get_initial_message()
 
         self.assertIsNotNone(msg)
         self.assertIn("gael", msg.lower())
         self.assertIn("lyra", msg.lower())
+        self.assertIn("sylvan", msg.lower())
 
         # Avec persona - devrait retourner None
         mode.set_persona("gael")
         msg = mode.get_initial_message()
+        self.assertIsNone(msg)
+
+        # Avec persona Sylvan - devrait aussi retourner None
+        mode_sylvan = GameMasterMode()
+        mode_sylvan.set_persona("sylvan")
+        msg = mode_sylvan.get_initial_message()
         self.assertIsNone(msg)
 
     def test_is_valid_persona(self):
@@ -174,6 +204,9 @@ class TestGameMasterMode(unittest.TestCase):
         self.assertTrue(GameMasterMode.is_valid_persona("Gael"))
         self.assertTrue(GameMasterMode.is_valid_persona("LYRA"))
         self.assertTrue(GameMasterMode.is_valid_persona("lyra"))
+        self.assertTrue(GameMasterMode.is_valid_persona("sylvan"))
+        self.assertTrue(GameMasterMode.is_valid_persona("SYLVAN"))
+        self.assertTrue(GameMasterMode.is_valid_persona("Sylvan"))
 
         self.assertFalse(GameMasterMode.is_valid_persona("invalid"))
         self.assertFalse(GameMasterMode.is_valid_persona(""))
@@ -279,6 +312,7 @@ class TestPromptFiles(unittest.TestCase):
 
         self.assertTrue(os.path.exists(os.path.join(prompts_dir, 'game_master.md')))
         self.assertTrue(os.path.exists(os.path.join(prompts_dir, 'game_master_worldbuilder.md')))
+        self.assertTrue(os.path.exists(os.path.join(prompts_dir, 'game_master_conservation.md')))
 
     def test_other_prompts_exist(self):
         """Vérifier que les autres prompts existent"""
