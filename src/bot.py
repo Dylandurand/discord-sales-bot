@@ -131,9 +131,27 @@ class SalesChallengeBot(discord.Client):
     def _register_commands(self):
         """Enregistre toutes les commandes slash"""
 
+        @self.tree.error
+        async def on_app_command_error(
+            interaction: discord.Interaction,
+            error: app_commands.AppCommandError
+        ):
+            """Gestion globale des erreurs de commandes slash"""
+            import logging
+            logger = logging.getLogger(__name__)
+
+            # Interaction expirée (bot redémarré ou latence réseau) : ignorer silencieusement
+            if isinstance(error, app_commands.CommandInvokeError):
+                if isinstance(error.original, discord.NotFound) and error.original.code == 10062:
+                    logger.debug("Interaction expirée (10062) ignorée silencieusement")
+                    return
+
+            logger.error(f"Erreur non gérée dans une commande slash : {error}", exc_info=error)
+
         @self.tree.command(name="branding", description="Mode Branding avec sélection de persona")
         async def branding_command(interaction: discord.Interaction):
             """Démarre le mode Branding avec menu de sélection de persona"""
+            await interaction.response.defer()
             session = self.session_manager.get_session(interaction.user.id)
 
             # Créer un mode Branding sans persona (affichera le menu)
@@ -160,11 +178,12 @@ class SalesChallengeBot(discord.Client):
                 footer="Choisissez votre persona en tapant son prénom dans le chat"
             )
 
-            await interaction.response.send_message(embed=embed)
+            await interaction.followup.send(embed=embed)
 
         @self.tree.command(name="gamemaster", description="Mode Game Master JDR avec sélection de persona")
         async def gamemaster_command(interaction: discord.Interaction):
             """Démarre le mode Game Master avec menu de sélection de persona"""
+            await interaction.response.defer()
             session = self.session_manager.get_session(interaction.user.id)
 
             # Créer un mode Game Master sans persona (affichera le menu)
@@ -188,11 +207,12 @@ class SalesChallengeBot(discord.Client):
                 footer="Choisissez votre persona en tapant son prénom dans le chat"
             )
 
-            await interaction.response.send_message(embed=embed)
+            await interaction.followup.send(embed=embed)
 
         @self.tree.command(name="webradio", description="Mode Partenaire WebRadio")
         async def webradio_command(interaction: discord.Interaction):
             """Démarre le mode WebRadio"""
+            await interaction.response.defer()
             session = self.session_manager.get_session(interaction.user.id)
 
             # Créer et configurer le mode
@@ -215,11 +235,12 @@ class SalesChallengeBot(discord.Client):
                 color_key="webradio"
             )
 
-            await interaction.response.send_message(embed=embed)
+            await interaction.followup.send(embed=embed)
 
         @self.tree.command(name="organisation", description="Mode Client Organisation/Productivité (Plan Bzz)")
         async def organisation_command(interaction: discord.Interaction):
             """Démarre le mode Organisation"""
+            await interaction.response.defer()
             session = self.session_manager.get_session(interaction.user.id)
 
             # Créer et configurer le mode
@@ -242,11 +263,12 @@ class SalesChallengeBot(discord.Client):
                 color_key="organisation"
             )
 
-            await interaction.response.send_message(embed=embed)
+            await interaction.followup.send(embed=embed)
 
         @self.tree.command(name="reset", description="Réinitialise votre session")
         async def reset_command(interaction: discord.Interaction):
             """Réinitialise la session de l'utilisateur"""
+            await interaction.response.defer()
             self.session_manager.reset_session(interaction.user.id)
 
             embed = create_embed(
@@ -263,11 +285,12 @@ class SalesChallengeBot(discord.Client):
                 color_key="success"
             )
 
-            await interaction.response.send_message(embed=embed)
+            await interaction.followup.send(embed=embed)
 
         @self.tree.command(name="help", description="Affiche l'aide et les commandes disponibles")
         async def help_command(interaction: discord.Interaction):
             """Affiche l'aide"""
+            await interaction.response.defer()
             embed = discord.Embed(
                 title="🤖 Bot d'Entraînement Commercial",
                 description="Simulateur de clients pénibles pour améliorer vos compétences commerciales",
@@ -309,7 +332,7 @@ class SalesChallengeBot(discord.Client):
 
             embed.set_footer(text="Bonne chance dans vos entraînements commerciaux !")
 
-            await interaction.response.send_message(embed=embed)
+            await interaction.followup.send(embed=embed)
 
     async def setup_hook(self):
         """Configuration initiale du bot"""
