@@ -201,7 +201,10 @@ class SalesChallengeBot(discord.Client):
                     "*Tapez : `gael`*\n\n"
                     "**2️⃣ Lyra - LA BÂTISSEUSE D'UNIVERS** 🌍\n"
                     "Worldbuilder narratif, cherche cohérence du lore et outils multi-sensoriels.\n"
-                    "*Tapez : `lyra`*"
+                    "*Tapez : `lyra`*\n\n"
+                    "**3️⃣ Sylvan - LE GARDIEN DU VIVANT** 🌿\n"
+                    "World Builder conservation, ancre les créatures dans le vivant menacé.\n"
+                    "*Tapez : `sylvan`*"
                 ),
                 color_key="gamemaster",
                 footer="Choisissez votre persona en tapant son prénom dans le chat"
@@ -301,7 +304,7 @@ class SalesChallengeBot(discord.Client):
                 name="📋 Commandes Disponibles",
                 value=(
                     "🎨 `/branding` - Clients Web/Graphisme (3 personas)\n"
-                    "🎲 `/gamemaster` - Maître du Jeu JDR (2 personas)\n"
+                    "🎲 `/gamemaster` - Maître du Jeu JDR (3 personas)\n"
                     "📻 `/webradio` - Partenaire WebRadio\n"
                     "📋 `/organisation` - Client Organisation\n"
                     "🔄 `/reset` - Réinitialiser la session\n"
@@ -513,7 +516,8 @@ class SalesChallengeBot(discord.Client):
                 # Descriptions des personas
                 persona_descriptions = {
                     "gael": "MJ expérimenté passionné mais exigeant. Je cherche de l'immersion et une vraie valeur narrative, pas juste du joli.",
-                    "lyra": "Worldbuilder narratif pointilleux. Je conçois des univers sur le long terme et j'ai besoin de cohérence totale et d'outils multi-sensoriels."
+                    "lyra": "Worldbuilder narratif pointilleux. Je conçois des univers sur le long terme et j'ai besoin de cohérence totale et d'outils multi-sensoriels.",
+                    "sylvan": "World Builder orienté conservation. J'ancre chaque créature dans le vivant menacé et je n'achète que si l'offre honore le vivant et sert le jeu."
                 }
 
                 embed = create_embed(
@@ -533,7 +537,8 @@ class SalesChallengeBot(discord.Client):
                     description=(
                         "Veuillez choisir un persona valide :\n\n"
                         "• `gael` - LE MAÎTRE EXIGEANT 🎲\n"
-                        "• `lyra` - LA BÂTISSEUSE D'UNIVERS 🌍"
+                        "• `lyra` - LA BÂTISSEUSE D'UNIVERS 🌍\n"
+                        "• `sylvan` - LE GARDIEN DU VIVANT 🌿"
                     ),
                     color_key="error"
                 )
