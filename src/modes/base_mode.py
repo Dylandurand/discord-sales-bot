@@ -98,7 +98,7 @@ class BaseMode(ABC):
     def should_end_session(self, message: str) -> bool:
         """
         Check if the bot's message indicates the session should end.
-        This looks for decision markers in the bot's response.
+        This looks for the official decision marker in the bot's response.
 
         Args:
             message: The bot's message to check
@@ -106,20 +106,10 @@ class BaseMode(ABC):
         Returns:
             True if the session should end (decision made)
         """
-        decision_markers = [
-            "📊 DÉCISION :",
-            "ACHAT",
-            "REFUS",
-            "HÉSITATION",
-            "N'ACHÈTE PAS",
-            "HÉSITE",
-            "INTÉRÊT CONDITIONNEL",
-            "ACCORD"
-        ]
-
-        # Check if message contains decision markers
-        upper_message = message.upper()
-        return any(marker.upper() in upper_message for marker in decision_markers)
+        # Only check for the official decision format used in all prompts
+        # This prevents false positives when words like "achat", "refus", or "hésitation"
+        # appear in normal conversation context
+        return "📊 DÉCISION :" in message or "📊 DECISION :" in message
 
     async def handle_message(
         self,

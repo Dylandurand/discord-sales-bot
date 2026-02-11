@@ -60,12 +60,19 @@ class TestBrandingMode(unittest.TestCase):
         """Test de la détection de fin de session"""
         mode = BrandingMode()
 
-        # Messages qui devraient terminer la session
-        self.assertTrue(mode.should_end_session("DÉCISION FINALE : ACHAT"))
-        self.assertTrue(mode.should_end_session("DÉCISION FINALE : REFUS"))
+        # Messages qui devraient terminer la session (format officiel des prompts)
+        self.assertTrue(mode.should_end_session("📊 DÉCISION : ACHAT"))
+        self.assertTrue(mode.should_end_session("📊 DÉCISION : REFUS"))
+        self.assertTrue(mode.should_end_session("📊 DÉCISION : HÉSITATION"))
 
-        # Messages normaux
+        # Messages normaux de conversation (ne doivent PAS terminer la session)
         self.assertFalse(mode.should_end_session("Pouvez-vous m'en dire plus ?"))
+
+        # IMPORTANT: Mots clés dans le contexte normal (faux positifs à éviter)
+        self.assertFalse(mode.should_end_session("Pourquoi ferais-je un achat maintenant ?"))
+        self.assertFalse(mode.should_end_session("Je refuse de payer ce prix sans garanties"))
+        self.assertFalse(mode.should_end_session("J'hésite beaucoup à m'engager"))
+        self.assertFalse(mode.should_end_session("Cet accord ne me convient pas du tout"))
 
 
 class TestGameMasterMode(unittest.TestCase):
@@ -217,9 +224,16 @@ class TestGameMasterMode(unittest.TestCase):
         """Test de la détection de fin de session"""
         mode = GameMasterMode()
 
-        self.assertTrue(mode.should_end_session("DÉCISION FINALE : ACHAT"))
-        self.assertTrue(mode.should_end_session("DÉCISION FINALE : REFUS"))
+        # Format officiel des prompts
+        self.assertTrue(mode.should_end_session("📊 DÉCISION : ACHAT"))
+        self.assertTrue(mode.should_end_session("📊 DÉCISION : REFUS"))
+
+        # Messages normaux
         self.assertFalse(mode.should_end_session("Question normale"))
+
+        # Faux positifs à éviter
+        self.assertFalse(mode.should_end_session("Pourquoi ferais-je un achat sans voir de vraie valeur narrative ?"))
+        self.assertFalse(mode.should_end_session("Je refuse de payer pour du générique"))
 
 
 class TestWriterMode(unittest.TestCase):
@@ -371,9 +385,17 @@ class TestWriterMode(unittest.TestCase):
         """Test de la détection de fin de session"""
         mode = WriterMode()
 
-        self.assertTrue(mode.should_end_session("DÉCISION FINALE : ACHAT"))
-        self.assertTrue(mode.should_end_session("DÉCISION FINALE : REFUS"))
+        # Format officiel des prompts
+        self.assertTrue(mode.should_end_session("📊 DÉCISION : ACCEPTATION SOUS RÉSERVE"))
+        self.assertTrue(mode.should_end_session("📊 DÉCISION : REFUS"))
+        self.assertTrue(mode.should_end_session("📊 DÉCISION : RÉÉCRITURE DEMANDÉE"))
+
+        # Messages normaux
         self.assertFalse(mode.should_end_session("Intéressant, continuez..."))
+
+        # Faux positifs à éviter
+        self.assertFalse(mode.should_end_session("Pourquoi un acheteur choisirait ce livre ?"))
+        self.assertFalse(mode.should_end_session("Je refuse de croire que ça fonctionnera en librairie"))
 
     def test_init_with_persona(self):
         """Test de l'initialisation directe avec un persona"""
@@ -416,10 +438,17 @@ class TestWebRadioMode(unittest.TestCase):
         """Test de la détection de fin de session"""
         mode = WebRadioMode()
 
-        self.assertTrue(mode.should_end_session("DÉCISION FINALE : REFUS"))
-        self.assertTrue(mode.should_end_session("DÉCISION FINALE : ACCORD"))
-        self.assertTrue(mode.should_end_session("DÉCISION FINALE : INTÉRÊT CONDITIONNEL"))
+        # Format officiel des prompts
+        self.assertTrue(mode.should_end_session("📊 DÉCISION : REFUS"))
+        self.assertTrue(mode.should_end_session("📊 DÉCISION : ACCORD"))
+        self.assertTrue(mode.should_end_session("📊 DÉCISION : INTÉRÊT CONDITIONNEL"))
+
+        # Messages normaux
         self.assertFalse(mode.should_end_session("Message normal"))
+
+        # Faux positifs à éviter
+        self.assertFalse(mode.should_end_session("Un accord de partenariat nécessite des données vérifiables"))
+        self.assertFalse(mode.should_end_session("Je refuse de m'engager sans chiffres concrets"))
 
 
 class TestOrganisationMode(unittest.TestCase):
@@ -458,9 +487,17 @@ class TestOrganisationMode(unittest.TestCase):
         """Test de la détection de fin de session"""
         mode = OrganisationMode()
 
-        self.assertTrue(mode.should_end_session("DÉCISION FINALE : ACHAT"))
-        self.assertTrue(mode.should_end_session("DÉCISION FINALE : REFUS"))
+        # Format officiel des prompts
+        self.assertTrue(mode.should_end_session("📊 DÉCISION : ACHÈTE"))
+        self.assertTrue(mode.should_end_session("📊 DÉCISION : N'ACHÈTE PAS"))
+        self.assertTrue(mode.should_end_session("📊 DÉCISION : HÉSITE"))
+
+        # Messages normaux
         self.assertFalse(mode.should_end_session("Hmm, intéressant..."))
+
+        # Faux positifs à éviter
+        self.assertFalse(mode.should_end_session("J'hésite beaucoup à investir dans un autre outil"))
+        self.assertFalse(mode.should_end_session("Pourquoi n'achète-t-on pas plutôt un simple agenda ?"))
 
 
 class TestPromptFiles(unittest.TestCase):
