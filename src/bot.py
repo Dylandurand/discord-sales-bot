@@ -162,29 +162,30 @@ class SalesChallengeBot(discord.Client):
 
             await interaction.response.send_message(embed=embed)
 
-        @self.tree.command(name="gamemaster", description="Mode Game Master JDR")
+        @self.tree.command(name="gamemaster", description="Mode Game Master JDR avec sélection de persona")
         async def gamemaster_command(interaction: discord.Interaction):
-            """Démarre le mode Game Master"""
+            """Démarre le mode Game Master avec menu de sélection de persona"""
             session = self.session_manager.get_session(interaction.user.id)
 
-            # Créer et configurer le mode
-            mode = GameMasterMode()
-            session.set_mode(mode)
-            session.conversation_history = []
+            # Créer un mode Game Master sans persona (affichera le menu)
+            gamemaster_mode = GameMasterMode()
+            session.set_mode(gamemaster_mode)
+            session.conversation_history = []  # Reset history
 
+            # Créer un embed pour le menu de sélection
             embed = create_embed(
-                title="🎲 Mode Game Master JDR",
+                title="🎲 Mode Game Master - Sélection de Persona",
                 description=(
-                    "**Mode activé avec succès !**\n\n"
-                    "Je suis un maître du jeu passionné mais exigeant. "
-                    "Présentez-moi vos illustrations JDR générées par IA.\n\n"
-                    "Je vais évaluer :\n"
-                    "• La valeur narrative et l'immersion\n"
-                    "• L'authenticité vs illustrations générées par IA\n"
-                    "• Les droits d'usage (réutilisation, impression, projection)\n\n"
-                    "**À vous de me convaincre !**"
+                    "Choisissez votre profil de Maître de Jeu :\n\n"
+                    "**1️⃣ Gaël - LE MAÎTRE EXIGEANT** 🎲\n"
+                    "MJ expérimenté, cherche immersion et valeur narrative concrète.\n"
+                    "*Tapez : `gael`*\n\n"
+                    "**2️⃣ Lyra - LA BÂTISSEUSE D'UNIVERS** 🌍\n"
+                    "Worldbuilder narratif, cherche cohérence du lore et outils multi-sensoriels.\n"
+                    "*Tapez : `lyra`*"
                 ),
-                color_key="gamemaster"
+                color_key="gamemaster",
+                footer="Choisissez votre persona en tapant son prénom dans le chat"
             )
 
             await interaction.response.send_message(embed=embed)
@@ -277,7 +278,7 @@ class SalesChallengeBot(discord.Client):
                 name="📋 Commandes Disponibles",
                 value=(
                     "🎨 `/branding` - Clients Web/Graphisme (3 personas)\n"
-                    "🎲 `/gamemaster` - Maître du Jeu JDR\n"
+                    "🎲 `/gamemaster` - Maître du Jeu JDR (2 personas)\n"
                     "📻 `/webradio` - Partenaire WebRadio\n"
                     "📋 `/organisation` - Client Organisation\n"
                     "🔄 `/reset` - Réinitialiser la session\n"
@@ -471,6 +472,45 @@ class SalesChallengeBot(discord.Client):
                         "• `clara` - L'Équilibriste Épuisé·e\n"
                         "• `antoine` - Le Stratège Lucide\n"
                         "• `julie` - Le Sceptique Dominant"
+                    ),
+                    color_key="error"
+                )
+                await message.reply(embed=embed)
+            return
+
+        # Gérer la sélection de persona pour Game Master
+        if isinstance(session.current_mode, GameMasterMode) and not session.current_mode.persona_selected:
+            # L'utilisateur doit sélectionner un persona
+            persona_key = GameMasterMode.get_persona_key(message.content)
+
+            if persona_key:
+                # Sélection valide
+                session.current_mode.set_persona(persona_key)
+
+                # Descriptions des personas
+                persona_descriptions = {
+                    "gael": "MJ expérimenté passionné mais exigeant. Je cherche de l'immersion et une vraie valeur narrative, pas juste du joli.",
+                    "lyra": "Worldbuilder narratif pointilleux. Je conçois des univers sur le long terme et j'ai besoin de cohérence totale et d'outils multi-sensoriels."
+                }
+
+                embed = create_embed(
+                    title=f"✅ Persona : {session.current_mode.get_mode_name()}",
+                    description=(
+                        f"**Persona activé avec succès !**\n\n"
+                        f"{persona_descriptions.get(persona_key, '')}\n\n"
+                        "Présentez-moi vos illustrations JDR. Je vais les évaluer sans concession."
+                    ),
+                    color_key="gamemaster"
+                )
+                await message.reply(embed=embed)
+            else:
+                # Sélection invalide
+                embed = create_embed(
+                    title="❌ Persona Invalide",
+                    description=(
+                        "Veuillez choisir un persona valide :\n\n"
+                        "• `gael` - LE MAÎTRE EXIGEANT 🎲\n"
+                        "• `lyra` - LA BÂTISSEUSE D'UNIVERS 🌍"
                     ),
                     color_key="error"
                 )
