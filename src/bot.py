@@ -12,6 +12,7 @@ from .modes.branding_mode import BrandingMode
 from .modes.game_master_mode import GameMasterMode
 from .modes.webradio_mode import WebRadioMode
 from .modes.organisation_mode import OrganisationMode
+from .modes.writer_mode import WriterMode
 
 
 # Couleurs des modes selon le plan
@@ -20,6 +21,7 @@ MODE_COLORS = {
     "gamemaster": 0x9b59b6,  # Violet
     "webradio": 0xe67e22,  # Orange
     "organisation": 0x2ecc71,  # Vert
+    "writer": 0xe91e8c,  # Rose
     "default": 0x95a5a6,  # Gris
     "error": 0xe74c3c,  # Rouge
     "success": 0x2ecc71,  # Vert
@@ -212,6 +214,38 @@ class SalesChallengeBot(discord.Client):
 
             await interaction.followup.send(embed=embed)
 
+        @self.tree.command(name="ecriture", description="Mode Écriture avec sélection de persona éditorial")
+        async def ecriture_command(interaction: discord.Interaction):
+            """Démarre le mode Écriture avec menu de sélection de persona"""
+            await interaction.response.defer()
+            session = self.session_manager.get_session(interaction.user.id)
+
+            # Créer un mode Writer sans persona (affichera le menu)
+            writer_mode = WriterMode()
+            session.set_mode(writer_mode)
+            session.conversation_history = []  # Reset history
+
+            # Créer un embed pour le menu de sélection
+            embed = create_embed(
+                title="✍️ Mode Écriture - Sélection de Persona",
+                description=(
+                    "Choisissez votre interlocuteur éditorial :\n\n"
+                    "**1️⃣ Mireille - LA GARDIENNE DU FANTASTIQUE** ✨\n"
+                    "Éditrice senior YA fantastique, exigeante sur la voix et le positionnement.\n"
+                    "*Tapez : `mireille`*\n\n"
+                    "**2️⃣ Damien - L'ARCHITECTE DU SUSPENSE** 🔪\n"
+                    "Éditeur senior thriller YA, rigoureux sur la logique et le rythme.\n"
+                    "*Tapez : `damien`*\n\n"
+                    "**3️⃣ Rémi - L'ACHETEUR SCEPTIQUE** 😤\n"
+                    "Acheteur YA sceptique, compare tout aux écrans et remet en cause le format papier.\n"
+                    "*Tapez : `remi`*"
+                ),
+                color_key="writer",
+                footer="Choisissez votre persona en tapant son prénom dans le chat"
+            )
+
+            await interaction.followup.send(embed=embed)
+
         @self.tree.command(name="webradio", description="Mode Partenaire WebRadio")
         async def webradio_command(interaction: discord.Interaction):
             """Démarre le mode WebRadio"""
@@ -281,6 +315,7 @@ class SalesChallengeBot(discord.Client):
                     "Vous pouvez maintenant commencer un nouveau mode d'entraînement :\n\n"
                     "🎨 `/branding` - Clients Web/Graphisme\n"
                     "🎲 `/gamemaster` - Maître du Jeu JDR\n"
+                    "✍️ `/ecriture` - Éditeurs & Acheteurs Littéraires\n"
                     "📻 `/webradio` - Partenaire WebRadio\n"
                     "📋 `/organisation` - Client Organisation\n\n"
                     "Utilisez `/help` pour plus d'informations."
@@ -305,6 +340,7 @@ class SalesChallengeBot(discord.Client):
                 value=(
                     "🎨 `/branding` - Clients Web/Graphisme (3 personas)\n"
                     "🎲 `/gamemaster` - Maître du Jeu JDR (3 personas)\n"
+                    "✍️ `/ecriture` - Éditeurs & Acheteurs Littéraires (3 personas)\n"
                     "📻 `/webradio` - Partenaire WebRadio\n"
                     "📋 `/organisation` - Client Organisation\n"
                     "🔄 `/reset` - Réinitialiser la session\n"
@@ -397,7 +433,7 @@ class SalesChallengeBot(discord.Client):
         if message.content.startswith('/'):
             # Extraire le nom de la commande
             command_name = message.content.split()[0][1:].lower()
-            valid_commands = ["branding", "gamemaster", "webradio", "organisation", "reset", "help"]
+            valid_commands = ["branding", "gamemaster", "ecriture", "webradio", "organisation", "reset", "help"]
 
             if command_name not in valid_commands:
                 embed = create_embed(
@@ -407,6 +443,7 @@ class SalesChallengeBot(discord.Client):
                         "**Commandes disponibles :**\n"
                         "• `/branding` - Mode Branding\n"
                         "• `/gamemaster` - Mode Game Master\n"
+                        "• `/ecriture` - Mode Écriture\n"
                         "• `/webradio` - Mode WebRadio\n"
                         "• `/organisation` - Mode Organisation\n"
                         "• `/reset` - Réinitialiser\n"
@@ -454,6 +491,7 @@ class SalesChallengeBot(discord.Client):
                     "**Commencez votre entraînement avec l'une de ces commandes :**\n\n"
                     "🎨 `/branding` - Clients Web/Graphisme\n"
                     "🎲 `/gamemaster` - Maître du Jeu JDR\n"
+                    "✍️ `/ecriture` - Éditeurs & Acheteurs Littéraires\n"
                     "📻 `/webradio` - Partenaire WebRadio\n"
                     "📋 `/organisation` - Client Organisation\n\n"
                     "Utilisez `/help` pour plus d'informations."
@@ -539,6 +577,47 @@ class SalesChallengeBot(discord.Client):
                         "• `gael` - LE MAÎTRE EXIGEANT 🎲\n"
                         "• `lyra` - LA BÂTISSEUSE D'UNIVERS 🌍\n"
                         "• `sylvan` - LE GARDIEN DU VIVANT 🌿"
+                    ),
+                    color_key="error"
+                )
+                await message.reply(embed=embed)
+            return
+
+        # Gérer la sélection de persona pour Writer
+        if isinstance(session.current_mode, WriterMode) and not session.current_mode.persona_selected:
+            # L'utilisateur doit sélectionner un persona
+            persona_key = WriterMode.get_persona_key(message.content)
+
+            if persona_key:
+                # Sélection valide
+                session.current_mode.set_persona(persona_key)
+
+                # Descriptions des personas
+                persona_descriptions = {
+                    "mireille": "Éditrice senior spécialisée YA fantastique. Je cherche un projet solide, publiable et défendable en librairie. Pas juste un univers cool.",
+                    "damien": "Éditeur senior spécialisé thriller YA. La logique doit être béton, le rythme doit accrocher dès le chapitre 1.",
+                    "remi": "Acheteur potentiel, lecteur occasionnel. Je lis peu et je compare tout aux séries et aux réseaux. Convainquez-moi que ça vaut le coup — en papier."
+                }
+
+                embed = create_embed(
+                    title=f"✅ Persona : {session.current_mode.get_mode_name()}",
+                    description=(
+                        f"**Persona activé avec succès !**\n\n"
+                        f"{persona_descriptions.get(persona_key, '')}\n\n"
+                        "Présentez-moi votre projet. Je vais l'évaluer sans concession."
+                    ),
+                    color_key="writer"
+                )
+                await message.reply(embed=embed)
+            else:
+                # Sélection invalide
+                embed = create_embed(
+                    title="❌ Persona Invalide",
+                    description=(
+                        "Veuillez choisir un persona valide :\n\n"
+                        "• `mireille` - LA GARDIENNE DU FANTASTIQUE ✨\n"
+                        "• `damien` - L'ARCHITECTE DU SUSPENSE 🔪\n"
+                        "• `remi` - L'ACHETEUR SCEPTIQUE 😤"
                     ),
                     color_key="error"
                 )
